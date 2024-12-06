@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require("../../models/User");
 const CustomError = require("../../errors/CustomError");
+const { secretKey } = require('../../secret');
 
 const registerController = async (req, res, next) => {
     try {
@@ -40,9 +41,10 @@ const registerController = async (req, res, next) => {
       // Generate JWT token
       const token = jwt.sign(
         { userId: user._id, email: user.email, role: user.role },
-        'yourSecretKey', // Replace with your secret key or use environment variable
-        { expiresIn: '1h' } // Token expires in 1 hour
+        secretKey, 
+        { expiresIn: '1h' } 
       );
+      res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
   
       // Send response with token
       res.status(200).json({
